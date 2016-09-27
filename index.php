@@ -35,11 +35,11 @@ $log['branch'] = $branch;
 $command = 'cd '.$target.' && '.$config['git'].' checkout '.$branch.' 2>&1 && '.$config['git'].' pull 2>&1';
 $log['command'] = $command;
 $log['result'] = explode(PHP_EOL, shell_exec($command));
-
 if (end($log['result']) === '') {
     array_pop($log['result']);
 }
 
+// Write log
 if ($fs) {
     fwrite($fs, var_export($log, true).PHP_EOL);
     $fs and fclose($fs);
