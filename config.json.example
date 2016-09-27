@@ -1,0 +1,11 @@
+{
+  "token": "10b3df25867af8bbfb182f76728592cc0b1956d6",
+  "git": "/usr/bin/git",
+  "log": "/var/log/apache/webhook.log",
+  "develop": {
+    "target": "/var/www/develop"
+  },
+  "master": {
+    "target": "/var/www/production"
+  }
+}
