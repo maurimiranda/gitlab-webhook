@@ -1,6 +1,6 @@
 <?php
 // Get config
-$config = json_decode(file_get_contents('./config.json'), true);
+$config = json_decode(file_get_contents('/etc/webhook/config.json'), true);
 
 // Check token
 if (!array_key_exists('HTTP_X_GITLAB_TOKEN', $_SERVER) ||
