@@ -42,7 +42,7 @@ if (end($log['result']) === '') {
 
 // Write log
 if ($fs) {
-    fwrite($fs, var_export($log, true).PHP_EOL);
+    fwrite($fs, print_r($log, true).PHP_EOL);
     $fs and fclose($fs);
 }
 ?>
