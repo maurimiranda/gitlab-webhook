@@ -9,11 +9,10 @@ if (!array_key_exists('HTTP_X_GITLAB_TOKEN', $_SERVER) ||
 }
 
 // Get request data
-$json = file_get_contents('php://input');
-$data = json_decode($json, true);
+$data = json_decode(file_get_contents('php://input'), true);
 
 // Get branch and target
-$branch = substr($data["ref"], strrpos($data["ref"], '/') + 1);
+$branch = substr($data['ref'], strrpos($data['ref'], '/') + 1);
 if (!array_key_exists($branch, $config)) {
     exit('Invalid branch');
 }
@@ -22,8 +21,10 @@ $target = $config[$branch]['target'];
 // Create log
 $log = array();
 $fs = fopen($config['log'], 'a');
-$log['date'] = date("Y-m-d H:i:s");
+$log['date'] = date('c');
 $log['branch'] = $branch;
+$log['commit'] = $data['after'];
+$log['user'] = $data['user_name'];
 
 // Add full request data to log
 //$log['data'] = $data;
