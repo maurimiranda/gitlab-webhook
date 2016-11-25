@@ -11,12 +11,16 @@ if (!array_key_exists('HTTP_X_GITLAB_TOKEN', $_SERVER) ||
 // Get request data
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Get branch and target
+// Get project and branch
+$project = $data['project']['name'];
 $branch = substr($data['ref'], strrpos($data['ref'], '/') + 1);
 if (!array_key_exists($branch, $config)) {
     exit('Invalid branch');
 }
-$target = $config[$branch]['target'];
+// Get target, commands and emails from config
+$target = $config[$project][$branch]['target'];
+$commands = $config[$project][$branch]['commands'];
+$emails = $config[$project][$branch]['emails'];
 
 // Create log
 $log = array();
@@ -34,6 +38,7 @@ $log['user'] = $data['user_name'];
 
 // Execute commands
 $command = 'cd '.$target.' && '.$config['git'].' checkout '.$branch.' 2>&1 && '.$config['git'].' pull 2>&1';
+$command = $command . join(' 2>&1 && ', $commands);
 $log['command'] = $command;
 $log['result'] = explode(PHP_EOL, shell_exec($command));
 if (end($log['result']) === '') {
@@ -45,4 +50,8 @@ if ($fs) {
     fwrite($fs, print_r($log, true).PHP_EOL);
     $fs and fclose($fs);
 }
+
+// Send logs by emails
+mail(join(',', $emails), 'Webhook Log', print_r($log, true).PHP_EOL);
+
 ?>
