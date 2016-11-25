@@ -38,7 +38,9 @@ $log['user'] = $data['user_name'];
 
 // Execute commands
 $command = 'cd '.$target.' && '.$config['git'].' checkout '.$branch.' 2>&1 && '.$config['git'].' pull 2>&1';
-$command = $command . join(' 2>&1 && ', $commands);
+if (count($commands) > 0) {
+  $command = $command . ' && ' .join(' 2>&1 && ', $commands);
+}
 $log['command'] = $command;
 $log['result'] = explode(PHP_EOL, shell_exec($command));
 if (end($log['result']) === '') {
@@ -52,6 +54,8 @@ if ($fs) {
 }
 
 // Send logs by emails
-mail(join(',', $emails), 'Webhook Log', print_r($log, true).PHP_EOL);
+if (count($emails) > 0) {
+  mail(join(',', $emails), 'Webhook Log', print_r($log, true).PHP_EOL);
+}
 
 ?>
