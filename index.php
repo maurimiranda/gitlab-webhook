@@ -39,6 +39,7 @@ if (!array_key_exists($branch, $config['projects'][$project])) {
 }
 $log['commit'] = $data['after'];
 $log['user'] = $data['user_name'];
+$log['message'] = end($data['commits'])['message'];
 
 // Get target, commands and emails from config
 $target = $config['projects'][$project][$branch]['target'];
@@ -48,7 +49,7 @@ $emails = $config['projects'][$project][$branch]['emails'];
 // Execute commands
 $command = 'cd '.$target.' && '.$config['git'].' checkout '.$branch.' 2>&1 && '.$config['git'].' pull 2>&1';
 if (count($commands) > 0) {
-  $command = $command . ' && ' .join(' 2>&1 && ', $commands);
+  $command = $command . ' && ' . join(' 2>&1 && ', $commands) . ' 2>&1';
 }
 $log['command'] = $command;
 $log['result'] = explode(PHP_EOL, shell_exec($command));
