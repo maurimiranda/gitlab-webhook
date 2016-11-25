@@ -1,40 +1,49 @@
 <?php
+
+// Create log
+$log = array();
+$log['date'] = date('c');
+
 // Get config
 $config = json_decode(file_get_contents('/etc/webhook/config.json'), true);
+//$log['config'] = config;
 
 // Check token
 if (!array_key_exists('HTTP_X_GITLAB_TOKEN', $_SERVER) ||
     $_SERVER['HTTP_X_GITLAB_TOKEN'] !== $config['token']) {
-    exit('Invalid token');
+    $log['error'] = 'Invalid token';
+    error_log(print_r($log, true));
+    exit();
 }
 
 // Get request data
 $data = json_decode(file_get_contents('php://input'), true);
+//$log['data'] = $data;
 
-// Get project and branch
+// Get project
 $project = $data['project']['name'];
-$branch = substr($data['ref'], strrpos($data['ref'], '/') + 1);
-if (!array_key_exists($branch, $config)) {
-    exit('Invalid branch');
+$log['project'] = $project;
+if (!array_key_exists($project, $config['projects'])) {
+    $log['error'] = 'Invalid project';
+    error_log(print_r($log, true));
+    exit();
 }
-// Get target, commands and emails from config
-$target = $config[$project][$branch]['target'];
-$commands = $config[$project][$branch]['commands'];
-$emails = $config[$project][$branch]['emails'];
 
-// Create log
-$log = array();
-$fs = fopen($config['log'], 'a');
-$log['date'] = date('c');
+// Get branch
+$branch = substr($data['ref'], strrpos($data['ref'], '/') + 1);
 $log['branch'] = $branch;
+if (!array_key_exists($branch, $config['projects'][$project])) {
+    $log['error'] = 'Invalid branch';
+    error_log(print_r($log, true));
+    exit();
+}
 $log['commit'] = $data['after'];
 $log['user'] = $data['user_name'];
 
-// Add full request data to log
-//$log['data'] = $data;
-
-// Add full config to log
-//$log['config'] = config;
+// Get target, commands and emails from config
+$target = $config['projects'][$project][$branch]['target'];
+$commands = $config['projects'][$project][$branch]['commands'];
+$emails = $config['projects'][$project][$branch]['emails'];
 
 // Execute commands
 $command = 'cd '.$target.' && '.$config['git'].' checkout '.$branch.' 2>&1 && '.$config['git'].' pull 2>&1';
@@ -48,6 +57,7 @@ if (end($log['result']) === '') {
 }
 
 // Write log
+$fs = fopen($config['log'], 'a');
 if ($fs) {
     fwrite($fs, print_r($log, true).PHP_EOL);
     $fs and fclose($fs);
