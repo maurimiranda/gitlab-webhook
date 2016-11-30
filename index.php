@@ -6,13 +6,14 @@ $log['date'] = date('c');
 
 // Get config
 $config = json_decode(file_get_contents('/etc/webhook/config.json'), true);
-//$log['config'] = config;
+//$log['config'] = $config;
 
 // Check token
 if (!array_key_exists('HTTP_X_GITLAB_TOKEN', $_SERVER) ||
     $_SERVER['HTTP_X_GITLAB_TOKEN'] !== $config['token']) {
+    $log['token'] = $_SERVER['HTTP_X_GITLAB_TOKEN'];
     $log['error'] = 'Invalid token';
-    error_log(print_r($log, true));
+    error_log(print_r($log, true).PHP_EOL);
     exit();
 }
 
@@ -25,7 +26,7 @@ $project = $data['project']['name'];
 $log['project'] = $project;
 if (!array_key_exists($project, $config['projects'])) {
     $log['error'] = 'Invalid project';
-    error_log(print_r($log, true));
+    error_log(print_r($log, true).PHP_EOL);
     exit();
 }
 
@@ -34,7 +35,7 @@ $branch = substr($data['ref'], strrpos($data['ref'], '/') + 1);
 $log['branch'] = $branch;
 if (!array_key_exists($branch, $config['projects'][$project])) {
     $log['error'] = 'Invalid branch';
-    error_log(print_r($log, true));
+    error_log(print_r($log, true).PHP_EOL);
     exit();
 }
 $log['commit'] = $data['after'];
