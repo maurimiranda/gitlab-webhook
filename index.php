@@ -47,7 +47,7 @@ $command = $config[$project][$branch]['command'];
 $emails = $config[$project][$branch]['emails'];
 
 // Execute commands
-$log['result'] = explode(PHP_EOL, shell_exec($command));
+$log['result'] = explode(PHP_EOL, shell_exec($command . ' 2>&1'));
 if (end($log['result']) === '') {
     array_pop($log['result']);
 }
