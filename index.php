@@ -5,7 +5,7 @@ $log = array();
 $log['date'] = date('c');
 
 // Get config
-$config = json_decode(file_get_contents('/etc/webhook/config.json'), true);
+$config = json_decode(file_get_contents('./config.json'), true);
 //$log['config'] = $config;
 
 // Check token
