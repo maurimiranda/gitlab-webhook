@@ -8,14 +8,6 @@
       ]
     }
   },
-  "SIASAR-Dashboard": {
-    "master": {
-      "command": "./dashboard.sh",
-      "emails": [
-        "maurimiranda@gmail.com"
-      ]
-    }
-  },
   "SIASAR_public": {
     "master": {
       "command": "./drupal-public.sh",
